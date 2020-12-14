@@ -8,7 +8,7 @@ This also demonstrates building protobufs with Bazel, which makes invoking `prot
 
 # For more details
 
-Read more details about this in [the corresponding blog post](https://eggybits.com/posts/proto-two-ways/) on eggybits.com.
+Read more details about this in [the corresponding blog post](https://www.eggybits.com/posts/protobuf-two-ways/) on eggybits.com.
 
 # To run and build as-written
 
