@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+package annotations;
+
+option go_package = "protos/annotations";
+
+extend google.protobuf.ServiceOptions {
+  // If true, a corresponding client mock will be generated for this service
+  optional bool client_mock = 90001;
+}

@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+import "protos/annotations/clean.proto";
+import "protos/annotations/clientmock.proto";
+
+package todo;
+
+// TODO(melinda): maybe next time think of a better example than todo
+
+option go_package = "protos/todo";
+
+service TodoService {
+  option (annotations.client_mock) = true;
+
+  rpc CreateTodo (CreateTodoRequest) returns (CreateTodoResponse);
+}
+
+message CreateTodoRequest {
+  optional string name = 1;
+  optional string description = 2 [(annotations.do_not_clean) = true];
+  optional bool is_complete = 3;
+}
+
+message CreateTodoResponse {
+  optional int32 id = 1;
+}
