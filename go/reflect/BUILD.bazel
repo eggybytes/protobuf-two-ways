@@ -18,7 +18,7 @@ go_test(
   srcs = ["clean_test.go"],
   embed = [":go_default_library"],
   deps = [
-    "//protos/todo:todo_grpc_go_library",
+    "//protos/example:example_grpc_go_library",
     "@com_github_stretchr_testify//assert:go_default_library",
   ],
 )

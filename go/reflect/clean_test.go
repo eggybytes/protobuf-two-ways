@@ -3,7 +3,7 @@ package protobuf
 import (
 	"testing"
 
-	"protos/todo"
+	"protos/example"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
@@ -24,25 +24,25 @@ func TestClean(t *testing.T) {
 		{
 			"top-level empty strings and zero values should be replaced with nil",
 			args{
-				&todo.CreateTodoRequest{
+				&example.CreateTodoRequest{
 					Name:       proto.String(""),
 					IsComplete: proto.Bool(false),
 				},
 			},
 			want{
-				&todo.CreateTodoRequest{},
+				&example.CreateTodoRequest{},
 			},
 		},
 		{
 			"fields marked with do_not_clean do not get cleaned",
 			args{
-				&todo.CreateTodoRequest{
+				&example.CreateTodoRequest{
 					Name:        proto.String("do me"),
 					Description: proto.String(""),
 				},
 			},
 			want{
-				&todo.CreateTodoRequest{
+				&example.CreateTodoRequest{
 					Name:        proto.String("do me"),
 					Description: proto.String(""),
 				},

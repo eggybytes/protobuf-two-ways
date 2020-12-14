@@ -3,11 +3,11 @@ syntax = "proto2";
 import "protos/annotations/clean.proto";
 import "protos/annotations/clientmock.proto";
 
-package todo;
+package example;
 
 // TODO(melinda): maybe next time think of a better example than todo
 
-option go_package = "protos/todo";
+option go_package = "protos/example";
 
 service TodoService {
   option (annotations.client_mock) = true;
