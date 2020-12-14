@@ -1,10 +1,10 @@
 # protobuf-two-ways
 
 This repository demonstrates two ways of using Go's [new protobuf API](https://blog.golang.org/protobuf-apiv2) to extend your protobufs and make them more powerful: 
-1. Code generation at compile-time, with [`protogen`](https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen)
-2. Reflection at runtime, with [`protoreflect`](https://pkg.go.dev/google.golang.org/protobuf/reflect/protoreflect)
+1. Code generation at compile-time, with [`protogen`](https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen) — code in [go/plugin/](./go/plugin/)
+2. Reflection at runtime, with [`protoreflect`](https://pkg.go.dev/google.golang.org/protobuf/reflect/protoreflect) — code in [go/reflect/](./go/reflect/)
 
-This also demonstrates building protobufs with Bazel, which makes invoking `protoc` (the protobuf compiler) a smooth part of the development workflow.
+This also demonstrates building protobufs with Bazel, which makes invoking `protoc` (the protobuf compiler) a smooth part of the development workflow. See [protos/](./protos/) and `BUILD.bazel` files throughout this repo for details.
 
 # For more details
 
