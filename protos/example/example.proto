@@ -9,18 +9,25 @@ package example;
 
 option go_package = "protos/example";
 
-service TodoService {
+service EggDeliveryService {
   option (annotations.client_mock) = true;
 
-  rpc CreateTodo (CreateTodoRequest) returns (CreateTodoResponse);
+  rpc OrderEgg (OrderEggRequest) returns (OrderEggResponse);
 }
 
-message CreateTodoRequest {
+message OrderEggRequest {
   optional string name = 1;
   optional string description = 2 [(annotations.do_not_clean) = true];
-  optional bool is_complete = 3;
+  optional int32 num_eggs = 3;
+  optional bool with_shell = 4;
+  optional Recipient recipient = 5;
 }
 
-message CreateTodoResponse {
-  optional int32 id = 1;
+message OrderEggResponse {
+  optional int32 minutes_to_egg = 1;
+}
+
+message Recipient {
+  optional string name = 1;
+  optional string address = 2;
 }

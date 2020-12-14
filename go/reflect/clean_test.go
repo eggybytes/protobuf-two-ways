@@ -22,28 +22,49 @@ func TestClean(t *testing.T) {
 		want want
 	}{
 		{
-			"top-level empty strings and zero values should be replaced with nil",
+			"top-level empty OrderEggRequest and zero values should be replaced with nil",
 			args{
-				&example.CreateTodoRequest{
-					Name:       proto.String(""),
-					IsComplete: proto.Bool(false),
+				&example.OrderEggRequest{
+					Name:      proto.String(""),
+					WithShell: proto.Bool(false),
 				},
 			},
 			want{
-				&example.CreateTodoRequest{},
+				&example.OrderEggRequest{},
+			},
+		},
+		{
+			"nested fields also get cleaned",
+			args{
+				&example.OrderEggRequest{
+					Name: proto.String("nice order"),
+					Recipient: &example.Recipient{
+						Name:    proto.String("Denton"),
+						Address: proto.String(""),
+					},
+				},
+			},
+			want{
+				&example.OrderEggRequest{
+					Name: proto.String("nice order"),
+					Recipient: &example.Recipient{
+						Name:    proto.String("Denton"),
+						Address: nil,
+					},
+				},
 			},
 		},
 		{
 			"fields marked with do_not_clean do not get cleaned",
 			args{
-				&example.CreateTodoRequest{
-					Name:        proto.String("do me"),
+				&example.OrderEggRequest{
+					Name:        proto.String("im an order"),
 					Description: proto.String(""),
 				},
 			},
 			want{
-				&example.CreateTodoRequest{
-					Name:        proto.String("do me"),
+				&example.OrderEggRequest{
+					Name:        proto.String("im an order"),
 					Description: proto.String(""),
 				},
 			},
