@@ -11,8 +11,9 @@ proto_library(
 )
 
 go_proto_library(
-  name = "organization_grpc_go_library",
+  name = "todo_grpc_go_library",
   compilers = [
+    "//go/plugin:protoc-gen-custom",
     "//protos:protoc-gen-go",
     "//protos:protoc-gen-grpc",
   ],
