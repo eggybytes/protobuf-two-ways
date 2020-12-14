@@ -5,8 +5,6 @@ import "protos/annotations/clientmock.proto";
 
 package example;
 
-// TODO(melinda): maybe next time think of a better example than todo
-
 option go_package = "protos/example";
 
 service EggDeliveryService {

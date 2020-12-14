@@ -2,18 +2,13 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log"
-	"strings"
 	"text/template"
 
 	"protos/annotations"
 
-	"github.com/eggybytes/protobuf-two-ways/go/helpers"
-
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var needsClientMockImports = map[string]bool{}
@@ -28,11 +23,11 @@ func NewClientMockGenerator() *ClientMockGenerator {
 }
 
 func (cmg *ClientMockGenerator) Generate(g *protogen.GeneratedFile, file *protogen.File) {
-	for _, pb := range file.Proto.GetService() {
-		if shouldGenerateClientMock(pb) {
+	for _, svc := range file.Services {
+		if shouldGenerateClientMock(svc) {
 			needsClientMockImports[file.GeneratedFilenamePrefix] = true
-			cmg.generateClientMockFactory(g, pb)
-			cmg.generateClientMockMethods(g, pb, file)
+			cmg.generateClientMockFactory(g, svc)
+			cmg.generateClientMockMethods(g, svc, file)
 		}
 	}
 
@@ -54,19 +49,20 @@ func (cmg *ClientMockGenerator) Generate(g *protogen.GeneratedFile, file *protog
 
 // shouldGenerateClientMock determines whether or not the message is tagged with
 // (client_mock=true)
-func shouldGenerateClientMock(pb *descriptorpb.ServiceDescriptorProto) bool {
-	if pb.GetOptions() == nil {
+func shouldGenerateClientMock(svc *protogen.Service) bool {
+	opts := svc.Desc.Options()
+	if opts == nil {
 		return false
 	}
 
-	if proto.GetExtension(pb.GetOptions(), annotations.E_ClientMock).(bool) {
+	if proto.GetExtension(opts, annotations.E_ClientMock).(bool) {
 		return true
 	}
 
 	return false
 }
 
-func (cmg *ClientMockGenerator) generateClientMockFactory(g *protogen.GeneratedFile, pb *descriptorpb.ServiceDescriptorProto) {
+func (cmg *ClientMockGenerator) generateClientMockFactory(g *protogen.GeneratedFile, svc *protogen.Service) {
 	factoryTemplate := `
 // Mock{{.ServiceName}}Client is a mock {{.ServiceName}}Client which
 // satisfies the {{.ServiceName}}Client interface.
@@ -83,7 +79,7 @@ func NewMock{{.ServiceName}}Client() *Mock{{.ServiceName}}Client {
 		log.Fatal(err)
 	}
 
-	serviceName := helpers.Camel(pb.GetName())
+	serviceName := svc.GoName
 	var buf bytes.Buffer
 	err = tpl.Execute(&buf, struct {
 		ServiceName string
@@ -98,7 +94,7 @@ func NewMock{{.ServiceName}}Client() *Mock{{.ServiceName}}Client {
 	g.P(buf.String())
 }
 
-func (cmg *ClientMockGenerator) generateClientMockMethods(g *protogen.GeneratedFile, pb *descriptorpb.ServiceDescriptorProto, file *protogen.File) {
+func (cmg *ClientMockGenerator) generateClientMockMethods(g *protogen.GeneratedFile, svc *protogen.Service, file *protogen.File) {
 	methodTemplate := `
 func (c *Mock{{.ServiceName}}Client) {{.MethodName}}(ctx context.Context, in *{{.RequestType}}, opts ...grpc.CallOption) (*{{.ResponseType}}, error) {
 	args := c.Called(ctx, in)
@@ -109,13 +105,12 @@ func (c *Mock{{.ServiceName}}Client) {{.MethodName}}(ctx context.Context, in *{{
 }
 `
 
-	for _, m := range pb.Method {
+	for _, m := range svc.Methods {
 		tpl, err := template.New("method").Parse(methodTemplate)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		origMethodName := m.GetName()
 		var buf bytes.Buffer
 		err = tpl.Execute(&buf, struct {
 			ServiceName  string
@@ -123,10 +118,10 @@ func (c *Mock{{.ServiceName}}Client) {{.MethodName}}(ctx context.Context, in *{{
 			RequestType  string
 			ResponseType string
 		}{
-			ServiceName:  helpers.Camel(pb.GetName()),
-			MethodName:   helpers.Camel(origMethodName),
-			RequestType:  typeName(file.GoPackageName, m.GetInputType()),
-			ResponseType: typeName(file.GoPackageName, m.GetOutputType()),
+			ServiceName:  svc.GoName,
+			MethodName:   m.GoName,
+			RequestType:  m.Input.GoIdent.GoName,
+			ResponseType: m.Output.GoIdent.GoName,
 		})
 
 		if err != nil {
@@ -135,9 +130,4 @@ func (c *Mock{{.ServiceName}}Client) {{.MethodName}}(ctx context.Context, in *{{
 
 		g.P(buf.String())
 	}
-}
-
-// Since the types we're referring to are in the same package, we drop the leading `.` and the package name
-func typeName(trimPackageName protogen.GoPackageName, typeName string) string {
-	return strings.TrimLeft(typeName, fmt.Sprintf(".%s", trimPackageName))
 }
