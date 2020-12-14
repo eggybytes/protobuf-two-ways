@@ -1,2 +1,5 @@
 # Macs
 .DS_Store
+
+# Bazel stuff
+bazel-*
