@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+package annotations;
+
+option go_package = "protos/annotations";
+
+extend google.protobuf.FieldOptions {
+  // If true, tells Clean() function in go/reflect not to clean this field
+  optional bool do_not_clean = 80001;
+}
