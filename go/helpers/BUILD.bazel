@@ -1,0 +1,10 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+  name = "go_default_library",
+  srcs = [
+    "camel.go",
+  ],
+  importpath = "github.com/eggybytes/protobuf-two-ways/go/helpers",
+  visibility = ["//go:__subpackages__"],
+)

@@ -1,0 +1,39 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_go//proto:compiler.bzl", "go_proto_compiler")
+
+go_library(
+  name = "go_default_library",
+  srcs = [
+    "egg.go",
+    "clientmock.go",
+    "main.go",
+  ],
+  importpath = "github.com/eggybytes/protobuf-two-ways/go/plugin",
+  visibility = ["//visibility:private"],
+  deps = [
+    "//go/helpers:go_default_library",
+    "//protos/annotations:annotations_proto_go_library",
+    "@org_golang_google_protobuf//proto:go_default_library",
+    "@org_golang_google_protobuf//compiler/protogen:go_default_library",
+    "@org_golang_google_protobuf//types/descriptorpb:go_default_library",
+  ],
+)
+
+go_binary(
+  name = "protoc-gen-custom-bin",
+  embed = [":go_default_library"],
+  visibility = ["//visibility:private"],
+)
+
+go_proto_compiler(
+  name = "protoc-gen-custom",
+  options = [
+    "paths=source_relative",
+  ],
+  plugin = ":protoc-gen-custom-bin",
+  suffix = ".pb.custom.go",
+  visibility = ["//visibility:public"],
+  deps = [
+    "@com_github_stretchr_testify//mock:go_default_library",
+  ],
+)
