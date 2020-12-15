@@ -32,13 +32,63 @@ lrwxr-xr-x  1 melinda  admin  34 Dec  2 11:33 /usr/local/bin/bazel -> ../Cellar/
 
 ## Build everything
 
+To build every target defined in this repo with Bazel, run:
+
 ```shell
 bazel build //...
 ```
 
+## Test everything
+
+To run every test target defined in this repo with Bazel (there's only one right now), run:
+
+```shell
+bazel test //...
+```
+
 ## Inspect generated files
 
-In `bazel-out/.../protos/todo/...`, you'll find:  
+In `bazel-out/<your_architecture>/bin/protos/todo/todo_grpc_go_library_/protos/todo`, you'll find:  
 - **todo.pb.go**: standard protoc-gen-go output
 - **todo_grpc.pb.go**: standard protoc-gen-grpc output
 - **todo.pb.custom.go**: our custom code output
+
+`todo.pb.custom.go` should now look like:
+
+```go
+package todo
+
+import (
+	context "context"
+	mock "github.com/stretchr/testify/mock"
+	grpc "google.golang.org/grpc"
+)
+
+//             ████
+//           ██░░░░██
+//         ██░░░░░░░░██
+//         ██░░░░░░░░██
+//       ██░░░░░░░░░░░░██
+//       ██░░  ░░░░  ░░██
+//       ██░░░░    ░░░░██
+//         ██░░░░░░░░██
+//           ████▓▓██
+
+// MockEggDeliveryServiceClient is a mock EggDeliveryServiceClient which
+// satisfies the EggDeliveryServiceClient interface.
+type MockEggDeliveryServiceClient struct {
+	mock.Mock
+}
+
+func NewMockEggDeliveryServiceClient() *MockEggDeliveryServiceClient {
+	return &MockEggDeliveryServiceClient{}
+}
+
+func (c *MockEggDeliveryServiceClient) OrderEgg(ctx context.Context, in *OrderEggRequest, opts ...grpc.CallOption) (*OrderEggResponse, error) {
+	args := c.Called(ctx, in)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*OrderEggResponse), args.Error(1)
+}
+```
